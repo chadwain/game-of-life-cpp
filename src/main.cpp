@@ -24,7 +24,28 @@ int main() {
     int pixelFormat = SDL_GetWindowPixelFormat(window);
 
 	GridPatch gp1{};
+	GridPatchEdges gp1Edge{};
+
+	// Oscillator
 	gp1.setCell(40, 20, true);
+	gp1.setCell(40, 19, true);
+	gp1.setCell(40, 21, true);
+
+	// Beacon
+	gp1.setCell(25, 40, true);
+	gp1.setCell(26, 40, true);
+	gp1.setCell(25, 41, true);
+	gp1.setCell(27, 43, true);
+	gp1.setCell(28, 42, true);
+	gp1.setCell(28, 43, true);
+
+	// Glider
+	gp1.setCell(7, 10, true);
+	gp1.setCell(7, 11, true);
+	gp1.setCell(7, 12, true);
+	gp1.setCell(6, 12, true);
+	gp1.setCell(5, 11, true);
+
     SDL_Surface* gridSurface = GridPatchToSurface(gp1, pixelFormat, 10, 2);
     if (!gridSurface) return 1;
 
@@ -33,6 +54,14 @@ int main() {
     while (running) {
         while (SDL_PollEvent(&event)) {
             switch (event.type) {
+                case SDL_KEYDOWN:
+                    if (event.key.keysym.sym == SDLK_RETURN) {
+                        gp1 = updateGridPatch(gp1, gp1Edge);
+                        SDL_FreeSurface(gridSurface);
+                        gridSurface = GridPatchToSurface(gp1, pixelFormat, 10, 2);
+                        if (!gridSurface) return 1;
+                    }
+                    break;
                 case SDL_WINDOWEVENT:
                     if (event.window.event == SDL_WINDOWEVENT_CLOSE) running = false;
                     break;
