@@ -1,4 +1,5 @@
 #include "grid.h"
+#include "render.h"
 
 #include <SDL2/SDL.h>
 
@@ -23,30 +24,30 @@ int main() {
     SDL_Surface* windowSurface = SDL_GetWindowSurface(window);
     int pixelFormat = SDL_GetWindowPixelFormat(window);
 
-	GridPatch gp1{};
-	GridPatchEdges gp1Edge{};
+    GridPatch gp1{};
+    GridPatchEdges gp1Edge{};
 
-	// Oscillator
-	gp1.setCell(40, 20, true);
-	gp1.setCell(40, 19, true);
-	gp1.setCell(40, 21, true);
+    // Oscillator
+    gp1.setCell(40, 20, true);
+    gp1.setCell(40, 19, true);
+    gp1.setCell(40, 21, true);
 
-	// Beacon
-	gp1.setCell(25, 40, true);
-	gp1.setCell(26, 40, true);
-	gp1.setCell(25, 41, true);
-	gp1.setCell(27, 43, true);
-	gp1.setCell(28, 42, true);
-	gp1.setCell(28, 43, true);
+    // Beacon
+    gp1.setCell(25, 40, true);
+    gp1.setCell(26, 40, true);
+    gp1.setCell(25, 41, true);
+    gp1.setCell(27, 43, true);
+    gp1.setCell(28, 42, true);
+    gp1.setCell(28, 43, true);
 
-	// Glider
-	gp1.setCell(7, 10, true);
-	gp1.setCell(7, 11, true);
-	gp1.setCell(7, 12, true);
-	gp1.setCell(6, 12, true);
-	gp1.setCell(5, 11, true);
+    // Glider
+    gp1.setCell(7, 10, true);
+    gp1.setCell(7, 11, true);
+    gp1.setCell(7, 12, true);
+    gp1.setCell(6, 12, true);
+    gp1.setCell(5, 11, true);
 
-    SDL_Surface* gridSurface = GridPatchToSurface(gp1, pixelFormat, 10, 2);
+    SDL_Surface* gridSurface = gridPatchToSurface(gp1, pixelFormat, 6, 2);
     if (!gridSurface) return 1;
 
     bool running = true;
@@ -58,7 +59,7 @@ int main() {
                     if (event.key.keysym.sym == SDLK_RETURN) {
                         gp1 = updateGridPatch(gp1, gp1Edge);
                         SDL_FreeSurface(gridSurface);
-                        gridSurface = GridPatchToSurface(gp1, pixelFormat, 10, 2);
+                        gridSurface = gridPatchToSurface(gp1, pixelFormat, 6, 2);
                         if (!gridSurface) return 1;
                     }
                     break;
@@ -71,12 +72,13 @@ int main() {
             }
         }
 
-		SDL_BlitSurface(gridSurface, nullptr, windowSurface, nullptr);
+        SDL_BlitSurface(gridSurface, nullptr, windowSurface, nullptr);
         SDL_UpdateWindowSurface(window);
     }
 
-	SDL_FreeSurface(gridSurface);
+    SDL_FreeSurface(gridSurface);
     SDL_DestroyWindow(window);
     SDL_Quit();
     return 0;
 }
+

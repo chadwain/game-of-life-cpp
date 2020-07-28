@@ -4,6 +4,7 @@ add_executable(game-of-life)
 target_sources(game-of-life
 	PUBLIC "${CMAKE_SOURCE_DIR}/src/main.cpp"
 	PUBLIC "${CMAKE_SOURCE_DIR}/src/grid.cpp"
+	PUBLIC "${CMAKE_SOURCE_DIR}/src/render.cpp"
 )
 add_compile_options(-Wall -Wextra -Wpedantic)
 
