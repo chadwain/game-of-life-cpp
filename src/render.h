@@ -25,7 +25,7 @@ struct View {
     GridRange getGridRange() const noexcept;
 };
 
-SDL_Surface* gridPatchToSurface(const GridPatch& patch, int format, uint8_t square_length, uint8_t border_size) noexcept;
-//SDL_Surface* renderGridRange(const View& view, const Grid& grid, const GridRange& range) noexcept;
+void gridPatchToSurface(const GridPatch& patch, SDL_Surface* surface, uint8_t square_length, uint8_t border_size) noexcept;
+void renderGridRange(SDL_Surface* surface, const View& view, const Grid& grid, const GridRange& range) noexcept;
 
 #endif

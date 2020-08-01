@@ -26,6 +26,9 @@ int main() {
 
     GridPatch gp1{};
     GridPatchEdges gp1Edge{};
+    GridId gp1Id{};
+    gp1Id.x = 0;
+    gp1Id.y = 0;
 
     // Oscillator
     gp1.setCell(40, 20, true);
@@ -47,8 +50,22 @@ int main() {
     gp1.setCell(6, 12, true);
     gp1.setCell(5, 11, true);
 
-    SDL_Surface* gridSurface = gridPatchToSurface(gp1, pixelFormat, 6, 2);
+    Grid grid{};
+    grid.patches[gp1Id] = gp1;
+    grid.patchEdges[gp1Id] = gp1Edge;
+
+    SDL_Surface* gridSurface = SDL_CreateRGBSurfaceWithFormat(0, window_width, window_height, 32, SDL_GetWindowPixelFormat(window));
     if (!gridSurface) return 1;
+
+    View view{};
+    view.x = 0;
+    view.y = 0;
+    view.w = 1000;
+    view.h = 1000;
+    view.square_length = 6;
+    view.border_size = 2;
+    const auto range = view.getGridRange();
+    renderGridRange(gridSurface, view, grid, range);
 
     bool running = true;
     SDL_Event event{};
@@ -57,10 +74,8 @@ int main() {
             switch (event.type) {
                 case SDL_KEYDOWN:
                     if (event.key.keysym.sym == SDLK_RETURN) {
-                        gp1 = updateGridPatch(gp1, gp1Edge);
-                        SDL_FreeSurface(gridSurface);
-                        gridSurface = gridPatchToSurface(gp1, pixelFormat, 6, 2);
-                        if (!gridSurface) return 1;
+                        grid.patches[gp1Id] = updateGridPatch(grid.patches[gp1Id], grid.patchEdges[gp1Id]);
+                        renderGridRange(gridSurface, view, grid, range);
                     }
                     break;
                 case SDL_WINDOWEVENT:

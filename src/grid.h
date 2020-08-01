@@ -10,7 +10,20 @@ constexpr int grid_patch_size = 64;
 struct GridId {
     int8_t x;
     int8_t y;
+
+    bool operator==(GridId other) const {
+        return (this->x == other.x && this->y == other.y);
+    }
 };
+
+namespace std {
+    template <>
+    struct hash<GridId> {
+        size_t operator()(GridId id) const {
+            return static_cast<size_t>(id.x) << 8 + static_cast<size_t>(id.y);
+        }
+    };
+}
 
 struct GridPatch {
     std::array<bool, grid_patch_size * grid_patch_size> cells;
