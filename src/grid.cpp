@@ -180,3 +180,15 @@ bool areEdgesPopulated(const GridPatchEdges& edges) noexcept {
     return result;
 }
 
+void updateGrid(Grid& grid) noexcept {
+    for (auto it = grid.patches.begin(); it != grid.patches.end(); ++it) {
+        const GridId id = it->first;
+        GridPatch& patch = it->second;
+        const GridPatchEdges& edges = grid.patchEdges[id];
+
+        patch = updateGridPatch(patch, edges);
+
+        // TODO signal changes to other grid patches
+    }
+}
+

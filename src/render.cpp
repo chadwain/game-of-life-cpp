@@ -32,6 +32,14 @@ GridRange View::getGridRange() const noexcept {
     return result;
 }
 
+SDL_Surface* emptyPatchSurface(const View& view, uint32_t pixelFormat) noexcept {
+    const int32_t patchTotalLength = grid_patch_size * (static_cast<int32_t>(view.square_length) + static_cast<int32_t>(view.border_size));
+    SDL_Surface* patchSurface = SDL_CreateRGBSurfaceWithFormat(0, patchTotalLength, patchTotalLength, 32, pixelFormat);
+    GridPatch patch{};
+    gridPatchToSurface(patch, patchSurface, view.square_length, view.border_size);
+    return patchSurface;
+}
+
 void gridPatchToSurface(const GridPatch& patch, SDL_Surface* surface, uint8_t square_length, uint8_t border_size) noexcept {
     const int boxSize = static_cast<int>(square_length) + static_cast<int>(border_size);
 
@@ -44,7 +52,9 @@ void gridPatchToSurface(const GridPatch& patch, SDL_Surface* surface, uint8_t sq
             rect.y = y;
             rect.w = square_length;
             rect.h = square_length;
-            if (patch.getCell(i, j))
+            if (i == 0 || j == 0 || i == grid_patch_size - 1 || j == grid_patch_size - 1)
+                SDL_FillRect(surface, &rect, 0xd03030);
+            else if (patch.getCell(i, j))
                 SDL_FillRect(surface, &rect, 0x000000);
             else
                 SDL_FillRect(surface, &rect, 0xffffff);
@@ -55,7 +65,7 @@ void gridPatchToSurface(const GridPatch& patch, SDL_Surface* surface, uint8_t sq
     }
 }
 
-void renderGridRange(SDL_Surface* surface, const View& view, const Grid& grid, const GridRange& range) noexcept {
+void renderGridRange(SDL_Surface* surface, const View& view, const Grid& grid, const GridRange& range, SDL_Surface* emptySurface) noexcept {
     const int32_t patchTotalLength = grid_patch_size * (static_cast<int32_t>(view.square_length) + static_cast<int32_t>(view.border_size));
     assert(patchTotalLength <= 16384); // 2^14
 
@@ -74,17 +84,23 @@ void renderGridRange(SDL_Surface* surface, const View& view, const Grid& grid, c
             GridId id;
             id.x = i;
             id.y = j;
+
+            SDL_Surface* blitSource = nullptr;
             const auto patchOptional = grid.patches.find(id);
-            if (patchOptional == grid.patches.end()) continue;
-            const GridPatch& patch = patchOptional->second;
-            gridPatchToSurface(patch, patchSurface, view.square_length, view.border_size);
+            if (patchOptional != grid.patches.end()) {
+                const GridPatch& patch = patchOptional->second;
+                gridPatchToSurface(patch, patchSurface, view.square_length, view.border_size);
+                blitSource = patchSurface;
+            } else {
+                blitSource = emptySurface;
+            }
 
             SDL_Rect dest;
             dest.x = ((id.x * patchTotalLength - view.x) * patchTotalLength / view.w) * surface->w / imageWidth;
             dest.y = ((id.y * patchTotalLength - view.y) * patchTotalLength / view.h) * surface->w / imageWidth;
             dest.w = boxScaledWidth * surface->w / imageWidth;
             dest.h = boxScaledHeight * surface->w / imageWidth;
-            SDL_BlitScaled(patchSurface, nullptr, surface, &dest);
+            SDL_BlitScaled(blitSource, nullptr, surface, &dest);
         }
     }
 

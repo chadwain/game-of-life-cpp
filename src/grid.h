@@ -50,5 +50,6 @@ struct Grid {
 
 GridPatch updateGridPatch(const GridPatch& patch, const GridPatchEdges& edges) noexcept;
 bool areEdgesPopulated(const GridPatchEdges& edges) noexcept;
+void updateGrid(Grid& grid) noexcept;
 
 #endif
